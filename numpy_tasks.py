@@ -10,13 +10,9 @@ import matplotlib.pyplot as plt
 
 
 def sum_prod(data: MatrixVectorBatchInput) -> np.ndarray:
-    matrices, vectors = data.matrices, data.vectors
-    summ_shape = (matrices.shape[1], 1)
-    summ = np.zeros(summ_shape)
-    for A, x in zip(matrices, vectors):
-        summ += A @ x
-
-    return summ
+    matrices = data.matrices
+    vectors = data.vectors
+    return np.sum(matrices @ vectors, axis=0)
 
 
 
@@ -123,22 +119,24 @@ def draw_ellipse(data: EllipseInput) -> np.ndarray:
 
 
 
+
 def analyze_time_series(data: TimeSeriesInput) -> TimeSeriesStatistics:
-    values, window = data.values, data.window
-    arr = np.array(values)
+    arr = np.asarray(data.values)
+    window = data.window
+    mean = float(np.mean(arr))
+    variance = float(np.var(arr))
+    std = float(np.std(arr))
 
-    mean = np.mean(arr)
-    variance = np.var(arr)
-    std = np.std(arr)
-
-    is_max = (arr[1:-1] > arr[2:]) & (arr[1:-1] > arr[:-2])
+    is_max = (arr[1:-1] > arr[:-2]) & (arr[1:-1] > arr[2:])
     local_maxima_indices = np.where(is_max)[0] + 1
 
-    is_min = (arr[1:-1] < arr[2:]) & (arr[1:-1] < arr[:-2])
+    is_min = (arr[1:-1] < arr[:-2]) & (arr[1:-1] < arr[2:])
     local_minima_indices = np.where(is_min)[0] + 1
 
-    moving_average = np.array([np.mean(values[i:i+window])
-                               for i in range(len(values) - window + 1)])
+    moving_average = np.array([
+        np.mean(arr[i:i + window])
+        for i in range(len(arr) - window + 1)
+    ])
 
     return TimeSeriesStatistics(
         mean=mean,
@@ -148,6 +146,7 @@ def analyze_time_series(data: TimeSeriesInput) -> TimeSeriesStatistics:
         local_minima_indices=local_minima_indices,
         moving_average=moving_average
     )
+
 
 
 def one_hot(data: OneHotInput) -> np.ndarray:

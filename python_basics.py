@@ -61,37 +61,32 @@ def mse(data: VectorPairInput) -> float:
     return summ / n
 
 
-def is_prime(number) -> bool:
-    if number <= 1:
-        return False
-
-    for i in range(2, int(number ** 0.5) + 1):
-        if number % i == 0:
-            return False
-
-    return True
 
 def prime_factorization(data: PositiveIntegerInput) -> str:
     number = data.value
     power_number = {}
     s = ''
     i = 2
-    while number > 1:
-        if number % i == 0 and is_prime(i):
+    while i * i <= number:
+        while number % i == 0:
             if i not in power_number:
                 power_number[i] = 1
             else:
                 power_number[i] += 1
             number //= i
-        else:
-            i += 1
+        i += 1
+
+    if number > 1:
+        power_number[number] = 1
 
     for k in power_number:
         if power_number[k] == 1:
             s += f'({k})'
         else:
             s += f'({k}**{power_number[k]})'
+
     return s
+
 
 
 def pyramid(data: PositiveIntegerInput) -> int | str:
